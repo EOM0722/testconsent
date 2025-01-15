@@ -31,30 +31,39 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function resizeCanvas() {
-        const container = canvas.parentElement;
+        const container = canvas.parentElement.parentElement; // signature-pad-container
         const rect = container.getBoundingClientRect();
         const dpr = window.devicePixelRatio || 1;
         const oldData = canvas.toDataURL();
 
-        // 컨테이너 크기에 맞춰 캔버스 크기 설정
+        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+        const lineWidth = isMobile ? 1.5 : 2;
+
+        // CSS 크기 설정
         canvas.style.width = `${rect.width}px`;
         canvas.style.height = `${rect.height}px`;
 
         // 실제 캔버스 크기를 DPR에 맞게 설정
-        canvas.width = rect.width * dpr;
-        canvas.height = rect.height * dpr;
+        canvas.width = Math.floor(rect.width * dpr);
+        canvas.height = Math.floor(rect.height * dpr);
 
         // 컨텍스트 설정
         ctx.scale(dpr, dpr);
         ctx.strokeStyle = '#000000';
-        ctx.lineWidth = 2;
+        ctx.lineWidth = lineWidth;
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
+        
+        // 캔버스 배경을 흰색으로 설정
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
 
         // 이전 데이터 복원
-        if (oldData !== canvas.toDataURL()) {
+        if (oldData && oldData !== canvas.toDataURL()) {
             const img = new Image();
-            img.onload = () => ctx.drawImage(img, 0, 0);
+            img.onload = () => {
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            };
             img.src = oldData;
         }
     }
@@ -66,16 +75,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
         let clientX, clientY;
         if (e.touches && e.touches[0]) {
-            clientX = e.touches[0].clientX;
-            clientY = e.touches[0].clientY;
+            const touch = e.touches[0];
+            clientX = touch.clientX - rect.left;
+            clientY = touch.clientY - rect.top;
         } else {
-            clientX = e.clientX;
-            clientY = e.clientY;
+            clientX = e.clientX - rect.left;
+            clientY = e.clientY - rect.top;
         }
 
+        // 좌표 범위 제한
+        clientX = Math.max(0, Math.min(clientX, rect.width));
+        clientY = Math.max(0, Math.min(clientY, rect.height));
+
         return {
-            x: (clientX - rect.left) * scaleX,
-            y: (clientY - rect.top) * scaleY
+            x: clientX * scaleX,
+            y: clientY * scaleY
         };
     }
 
@@ -84,6 +98,12 @@ document.addEventListener("DOMContentLoaded", () => {
         isDrawing = true;
         const coords = getCoordinates(e);
         [lastX, lastY] = [coords.x, coords.y];
+
+        // 시작점 표시
+        ctx.beginPath();
+        ctx.moveTo(lastX, lastY);
+        ctx.lineTo(lastX, lastY);
+        ctx.stroke();
     }
 
     function draw(e) {
@@ -102,10 +122,12 @@ document.addEventListener("DOMContentLoaded", () => {
     function stopDrawing(e) {
         if (e) e.preventDefault();
         isDrawing = false;
+        ctx.beginPath(); // 현재 경로 초기화
     }
 
     function initializeEvents() {
-        resizeCanvas();
+        // 초기화할 때 캔버스 크기 조정
+        setTimeout(resizeCanvas, 100);
 
         // 터치 이벤트
         canvas.addEventListener("touchstart", startDrawing, { passive: false });
@@ -139,16 +161,29 @@ document.addEventListener("DOMContentLoaded", () => {
                 e.preventDefault();
             }
         });
+
+        // iOS 더블탭 줌 방지
+        document.addEventListener('touchend', (e) => {
+            if (e.target.closest('.signature-pad-container')) {
+                e.preventDefault();
+            }
+        }, { passive: false });
     }
 
     window.clearSignature = function() {
+        const dpr = window.devicePixelRatio || 1;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
         hasSignature = false;
     };
 
     function isCanvasEmpty() {
         const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
-        return !pixels.some(pixel => pixel !== 0);
+        return !pixels.some((pixel, index) => {
+            // 흰색이 아닌 픽셀 확인 (RGB가 모두 255가 아닌 경우)
+            return index % 4 !== 3 && pixel !== 255;
+        });
     }
 
     function validateForm() {
