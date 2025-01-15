@@ -31,43 +31,40 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function resizeCanvas() {
+        const container = canvas.parentElement;
+        const rect = container.getBoundingClientRect();
         const dpr = window.devicePixelRatio || 1;
-        const rect = canvas.getBoundingClientRect();
         const oldData = canvas.toDataURL();
 
-        // CSS 크기 설정
+        // 컨테이너 크기에 맞춰 캔버스 크기 설정
         canvas.style.width = `${rect.width}px`;
-        canvas.style.height = '200px';
+        canvas.style.height = `${rect.height}px`;
 
-        // 실제 캔버스 크기 설정
+        // 실제 캔버스 크기를 DPR에 맞게 설정
         canvas.width = rect.width * dpr;
-        canvas.height = 200 * dpr;
+        canvas.height = rect.height * dpr;
 
-        // 컨텍스트 스케일 조정
+        // 컨텍스트 설정
         ctx.scale(dpr, dpr);
         ctx.strokeStyle = '#000000';
-        ctx.lineWidth = 2 * dpr;
+        ctx.lineWidth = 2;
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
 
         // 이전 데이터 복원
         if (oldData !== canvas.toDataURL()) {
             const img = new Image();
-            img.onload = () => {
-                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-            };
+            img.onload = () => ctx.drawImage(img, 0, 0);
             img.src = oldData;
         }
     }
 
     function getCoordinates(e) {
         const rect = canvas.getBoundingClientRect();
-        const dpr = window.devicePixelRatio || 1;
         const scaleX = canvas.width / rect.width;
         const scaleY = canvas.height / rect.height;
 
         let clientX, clientY;
-
         if (e.touches && e.touches[0]) {
             clientX = e.touches[0].clientX;
             clientY = e.touches[0].clientY;
@@ -87,12 +84,6 @@ document.addEventListener("DOMContentLoaded", () => {
         isDrawing = true;
         const coords = getCoordinates(e);
         [lastX, lastY] = [coords.x, coords.y];
-        
-        // 시작점 그리기
-        ctx.beginPath();
-        ctx.moveTo(lastX, lastY);
-        ctx.lineTo(lastX, lastY);
-        ctx.stroke();
     }
 
     function draw(e) {
@@ -111,7 +102,6 @@ document.addEventListener("DOMContentLoaded", () => {
     function stopDrawing(e) {
         if (e) e.preventDefault();
         isDrawing = false;
-        ctx.beginPath(); // 현재 경로 초기화
     }
 
     function initializeEvents() {
@@ -136,15 +126,16 @@ document.addEventListener("DOMContentLoaded", () => {
             resizeTimer = setTimeout(resizeCanvas, 250);
         });
 
-        // 스크롤/줌 방지
+        // 기본 스크롤 동작 방지
         document.addEventListener('touchmove', (e) => {
-            if (e.target === canvas) {
+            if (e.target.closest('.signature-pad-container')) {
                 e.preventDefault();
             }
         }, { passive: false });
 
+        // 모바일에서 줌 방지
         document.addEventListener('gesturestart', (e) => {
-            if (e.target === canvas) {
+            if (e.target.closest('.signature-pad-container')) {
                 e.preventDefault();
             }
         });
