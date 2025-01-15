@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="ko">
+   <head>
+       <meta charset="utf-8" />
+       <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+       <meta name="description" content="사과나무구강유래물은행" />
+       <meta name="author" content="사과나무구강유래물은행" />
+       <title>인체유래물 기증 동의서 - AppleTree OralBiobank</title>
+       <!-- Favicon-->
+       <link rel="icon" type="image/x-icon" href="static/assets/favicon.ico" />
+       <!-- Google Fonts -->
+       <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@100;200;300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet" />
+       <!-- Bootstrap Icons -->
+       <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css" rel="stylesheet" />
+       <!-- Core theme CSS -->
+       <link rel="stylesheet" href="static/css/styles.css">
+   </head>
+   <body class="d-flex flex-column">
+       <main class="flex-shrink-0">
+           <!-- Navigation-->
+           <nav class="navbar navbar-expand-lg navbar-light bg-white py-3">
+               <div class="container px-5">
+                   <a class="navbar-brand" href="/"><span class="fw-bolder text-primary">AppleTree OralBiobank</span></a>
+               </div>
+           </nav>
+           <!-- Page content-->
+           <section class="py-5">
+               <div class="container px-5">
+                   <div class="bg-light rounded-4 py-5 px-4 px-md-5">
+                       <div class="text-center mb-5">
+                           <h1 class="fw-bolder">인체유래물등의 기증 동의서</h1>
+                           <p class="lead fw-normal text-muted mb-0">귀하의 인체유래물등의 기증과 관련하여 인체유래물은행에 보관되며, 귀하의 개인정보는 엄격히 보호됩니다.</p>
+                       </div>
+                       <div class="row gx-5 justify-content-center">
+                           <div class="col-lg-8 col-xl-6">
+                               <form id="contactForm" onsubmit="return false;">
+                                   <!-- 성명 입력 -->
+                                   <div class="form-floating mb-3">
+                                       <input class="form-control" id="name" type="text" placeholder="성명을 입력하세요..." required />
+                                       <label for="name">성명</label>
+                                   </div>
+                                   <!-- 생년월일 -->
+                                   <div class="mb-3">
+                                       <label class="form-label fw-bold">생년월일</label>
+                                       <div class="row">
+                                           <div class="col-sm-4">
+                                               <select class="form-select" id="birthYear" required>
+                                                   <option value="" selected>년(yyyy)</option>
+                                                   <script>
+                                                       const currentYear = new Date().getFullYear();
+                                                       for (let i = currentYear; i >= 1900; i--) {
+                                                           document.write(`<option value="${i}">${i}</option>`);
+                                                       }
+                                                   </script>
+                                               </select>
+                                           </div>
+                                           <div class="col-sm-4">
+                                               <select class="form-select" id="birthMonth" required>
+                                                   <option value="" selected>월(mm)</option>
+                                                   <script>
+                                                       for (let i = 1; i <= 12; i++) {
+                                                           document.write(`<option value="${i}">${i.toString().padStart(2, '0')}</option>`);
+                                                       }
+                                                   </script>
+                                               </select>
+                                           </div>
+                                           <div class="col-sm-4">
+                                               <select class="form-select" id="birthDay" required>
+                                                   <option value="" selected>일(dd)</option>
+                                                   <script>
+                                                       for (let i = 1; i <= 31; i++) {
+                                                           document.write(`<option value="${i}">${i.toString().padStart(2, '0')}</option>`);
+                                                       }
+                                                   </script>
+                                               </select>
+                                           </div>
+                                       </div>
+                                   </div>
+                                   <!-- 성별 입력 -->
+                                   <div class="form-floating mb-3">
+                                       <select class="form-select" id="gender" required>
+                                           <option value="" selected>성별을 선택하세요</option>
+                                           <option value="male">남성</option>
+                                           <option value="female">여성</option>
+                                       </select>
+                                       <label for="gender">성별</label>
+                                   </div>
+                                   <!-- 주소 입력 -->
+                                   <div class="form-floating mb-3">
+                                       <input class="form-control" id="address" type="text" placeholder="주소를 입력하세요..." required />
+                                       <label for="address">주소</label>
+                                   </div>
+                                   <!-- 연락처 입력 -->
+                                   <div class="form-floating mb-3">
+                                       <input class="form-control" id="phone" type="tel" placeholder="연락처를 입력하세요..." required />
+                                       <label for="phone">연락처</label>
+                                   </div>
+                                   <!-- 동의서 작성일 -->
+                                   <div class="mb-3">
+                                       <label class="form-label fw-bold">동의서 작성일</label>
+                                       <div class="row">
+                                           <div class="col-sm-4">
+                                               <select class="form-select" id="consentYear" required>
+                                                   <option value="" selected>년(yyyy)</option>
+                                                   <script>
+                                                       for (let i = currentYear; i >= 1900; i--) {
+                                                           document.write(`<option value="${i}">${i}</option>`);
+                                                       }
+                                                   </script>
+                                               </select>
+                                           </div>
+                                           <div class="col-sm-4">
+                                               <select class="form-select" id="consentMonth" required>
+                                                   <option value="" selected>월(mm)</option>
+                                                   <script>
+                                                       for (let i = 1; i <= 12; i++) {
+                                                           document.write(`<option value="${i}">${i.toString().padStart(2, '0')}</option>`);
+                                                       }
+                                                   </script>
+                                               </select>
+                                           </div>
+                                           <div class="col-sm-4">
+                                               <select class="form-select" id="consentDay" required>
+                                                   <option value="" selected>일(dd)</option>
+                                                   <script>
+                                                       for (let i = 1; i <= 31; i++) {
+                                                           document.write(`<option value="${i}">${i.toString().padStart(2, '0')}</option>`);
+                                                       }
+                                                   </script>
+                                               </select>
+                                           </div>
+                                       </div>
+                                   </div>
+                                   <!-- 서명 패드 -->
+                                   <div class="mb-4">
+                                       <label class="form-label fw-bold mb-2">서명</label>
+                                       <div class="border rounded p-3" style="position: relative; width: 100%; height: 200px; background-color: #f8f9fa;">
+                                           <canvas id="signatureCanvas" style="width: 100%; height: 100%; border: 1px solid #ccc;"></canvas>
+                                           <button type="button" class="btn btn-outline-secondary btn-sm" style="position: absolute; bottom: 10px; right: 10px;" onclick="clearSignature()">다시 서명하기</button>
+                                       </div>
+                                   </div>
+                                   <!-- 동의 체크박스 -->
+                                   <div class="form-check mb-3">
+                                       <input class="form-check-input" type="checkbox" id="consent" required />
+                                       <label class="form-check-label" for="consent">
+                                           위 내용을 모두 이해하였으며, 인체유래물등의 기증에 동의합니다.
+                                       </label>
+                                   </div>
+                                   <!-- Submit Button -->
+                                   <div class="text-center">
+                                       <button class="btn btn-primary btn-lg w-100" type="button" onclick="submitForm()">기증하고 문진</button>
+                                   </div>
+                               </form>
+                               <!-- Example Images -->
+                               <div class="mt-5">
+                                   <h3 class="text-center">입력 예시</h3>
+                                   <img src="static/img/1.jpg" alt="입력 예시 1" class="img-fluid mb-3" />
+                                   <img src="static/img/2.jpg" alt="입력 예시 2" class="img-fluid" />
+                               </div>
+                           </div>
+                       </div>
+                   </div>
+               </div>
+           </section>
+       </main>
+       <!-- Footer -->
+       <footer class="bg-white py-4 mt-auto">
+           <div class="container px-5">
+               <div class="row align-items-center justify-content-between flex-column flex-sm-row">
+                   <div class="col-auto"><div class="small m-0">Copyright &copy; 사과나무구강유래물은행 2025</div></div>
+               </div>
+           </div>
+       </footer>
+
+       <!-- JavaScript -->
+       <script>
+           let canvas = document.getElementById("signatureCanvas");
+           let ctx = canvas.getContext("2d");
+           let isDrawing = false;
+           let lastX = 0;
+           let lastY = 0;
+
+           // Canvas 크기 설정
+           function resizeCanvas() {
+               canvas.width = canvas.offsetWidth;
+               canvas.height = canvas.offsetHeight;
+               ctx.strokeStyle = 'blue';
+               ctx.lineWidth = 2;
+               ctx.lineCap = 'round';
+           }
+
+           // 초기 설정 및 리사이즈 이벤트 리스너
+           resizeCanvas();
+           window.addEventListener('resize', resizeCanvas);
+
+           // 마우스 이벤트
+           canvas.addEventListener("mousedown", startDrawing);
+           canvas.addEventListener("mousemove", draw);
+           canvas.addEventListener("mouseup", () => isDrawing = false);
+           canvas.addEventListener("mouseout", () => isDrawing = false);
+
+           // 터치 이벤트
+           canvas.addEventListener("touchstart", handleTouch);
+           canvas.addEventListener("touchmove", handleTouch);
+           canvas.addEventListener("touchend", () => isDrawing = false);
+
+           function startDrawing(e) {
+               isDrawing = true;
+               [lastX, lastY] = [e.offsetX, e.offsetY];
+           }
+
+           function draw(e) {
+               if (!isDrawing) return;
+               ctx.beginPath();
+               ctx.moveTo(lastX, lastY);
+               ctx.lineTo(e.offsetX, e.offsetY);
+               ctx.stroke();
+               [lastX, lastY] = [e.offsetX, e.offsetY];
+           }
+
+           function handleTouch(e) {
+               e.preventDefault();
+               const touch = e.touches[0];
+               const rect = canvas.getBoundingClientRect();
+               const x = touch.clientX - rect.left;
+               const y = touch.clientY - rect.top;
+
+               if (e.type === "touchstart") {
+                   isDrawing = true;
+                   lastX = x;
+                   lastY = y;
+               } else if (e.type === "touchmove" && isDrawing) {
+                   ctx.beginPath();
+                   ctx.moveTo(lastX, lastY);
+                   ctx.lineTo(x, y);
+                   ctx.stroke();
+                   lastX = x;
+                   lastY = y;
+               }
+           }
+
+           function clearSignature() {
+               ctx.clearRect(0, 0, canvas.width, canvas.height);
+           }
+
+           function validateForm() {
+               const requiredFields = ['name', 'birthYear', 'birthMonth', 'birthDay', 'gender', 'address', 'phone', 
+                                     'consentYear', 'consentMonth', 'consentDay'];
+               
+               for (const fieldId of requiredFields) {
+                   const field = document.getElementById(fieldId);
+                   if (!field.value) {
+                       alert('모든 필수 항목을 입력해주세요.');
+                       field.focus();
+                       return false;
+                   }
+               }
+
+               // 서명 확인
+               const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+               const pixels = imageData.data;
+               let hasSignature = false;
+               for (let i = 3; i < pixels.length; i += 4) {
+                   if (pixels[i] !== 0) {
+                       hasSignature = true;
+                       break;
+                   }
+               }
+
+               if (!hasSignature) {
+                   alert('서명을 해주세요.');
+                   return false;
+               }
+
+               return true;
+           }
+
+           async function submitForm() {
+               // 필수 필드 검증
+               if (!validateForm()) {
+                   return;
+               }
+
+               const consentChecked = document.getElementById("consent").checked;
+               if (!consentChecked) {
+                   alert("기증에 동의하려면 동의 체크박스를 선택해주세요.");
+                   return;
+               }
+
+               try {
+                   // 서명 데이터 저장
+                   const signatureData = canvas.toDataURL('image/png');
+                   const name = document.getElementById("name").value;
+
+                   const response = await fetch('http://localhost:8080/save-signature', {
+                       method: 'POST',
+                       headers: {
+                           'Content-Type': 'application/json',
+                       },
+                       body: JSON.stringify({
+                           signature: signatureData,
+                           name: name
+                       })
+                   });
+
+                   const result = await response.json();
+                   if (result.success) {
+                       alert("기증 감사합니다! 문진 사이트로 이동합니다.");
+                       window.location.href = "https://eo-m.com/2025/HSP/HSP_Controller.asp?part=nfc&mehId=GV4541&mtype=1";
+                   } else {
+                       alert("서명 저장 중 오류가 발생했습니다: " + (result.error || "알 수 없는 오류"));
+                   }
+               } catch (error) {
+                   console.error('Error:', error);
+                   alert("서버 연결 중 오류가 발생했습니다.");
+               }
+           }
+
+           // 페이지 로드 시 현재 날짜로 동의서 작성일 설정
+           document.addEventListener('DOMContentLoaded', function() {
+               const today = new Date();
+               document.getElementById('consentYear').value = today.getFullYear();
+               document.getElementById('consentMonth').value = today.getMonth() + 1;
+               document.getElementById('consentDay').value = today.getDate();
+           });
+       </script>
+   </body>
+</html>

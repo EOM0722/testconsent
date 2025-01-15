@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+   <meta charset="utf-8" />
+   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+   <meta name="description" content="사과나무구강유래물은행" />
+   <meta name="author" content="사과나무구강유래물은행" />
+   <title>기증 동의 선택 - 사과나무구강유래물은행</title>
+   <!-- Favicon -->
+   <link rel="icon" type="image/x-icon" href="static/assets/favicon.ico" />
+   <!-- Custom Google font -->
+   <link rel="preconnect" href="https://fonts.googleapis.com" />
+   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@100;200;300;400;500;600;700;800;900&amp;display=swap" rel="stylesheet" />
+   <!-- Bootstrap icons -->
+   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css" rel="stylesheet" />
+   <!-- Core theme CSS -->
+   <link rel="stylesheet" href="static/css/styles.css" />
+   <style>
+       .form-check {
+           display: flex;
+           align-items: center;
+           gap: 10px;
+       }
+       .form-check-input {
+           margin-left: 0;
+       }
+   </style>
+</head>
+<body class="d-flex flex-column h-100">
+   <main class="flex-shrink-0">
+       <!-- Navigation -->
+       <nav class="navbar navbar-expand-lg navbar-light bg-white py-3">
+           <div class="container px-5">
+               <a class="navbar-brand fw-bold text-primary" href="/"><span class="fw-bolder text-primary">AppleTree OralBiobank</span></a>
+           </div>
+       </nav>
+
+       <!-- Main Section -->
+       <section class="py-5">
+           <div class="container px-5">
+               <div class="bg-light rounded-4 py-5 px-4 px-md-5 text-center">
+                   <!-- 이미지 추가 -->
+                   <div class="mb-4">
+                       <img src="static/img/bank.jpg" alt="AppleTree OralBiobank Banner" class="img-fluid rounded">
+                   </div>
+                   <div class="text-center mb-5">
+                       <h1 class="fw-bolder">기증 동의 여부를 선택해주세요</h1>
+                       <p class="lead text-muted mb-0">귀하의 선택에 따라 절차가 진행됩니다.</p>
+                   </div>
+                   <form id="consentForm" class="mt-4">
+                       <!-- 동의 여부 선택 -->
+                       <div class="form-check mb-3">
+                           <input class="form-check-input" type="radio" name="consent" id="agree" value="agree" required />
+                           <label class="form-check-label" for="agree">기증에 동의합니다.</label>
+                       </div>
+                       <div class="form-check mb-3">
+                           <input class="form-check-input" type="radio" name="consent" id="disagree" value="disagree" required />
+                           <label class="form-check-label" for="disagree">기증에 동의하지 않습니다.</label>
+                       </div>
+
+                       <!-- Submit Button -->
+                       <div class="row g-3">
+                           <div class="col-12 text-center">
+                               <button type="submit" class="btn btn-primary btn-lg w-50">선택 완료</button>
+                           </div>
+                       </div>
+                   </form>
+               </div>
+           </div>
+       </section>
+   </main>
+
+   <!-- Footer -->
+   <footer class="bg-white py-4 mt-auto">
+       <div class="container px-5">
+           <div class="row align-items-center justify-content-between flex-column flex-sm-row">
+               <div class="col-auto"><div class="small m-0">Copyright &copy; 사과나무구강유래물은행 2025</div></div>
+               <div class="col-auto">
+                   <a class="small" href="#!">Privacy</a>
+                   <span class="mx-1">&middot;</span>
+                   <a class="small" href="#!">Terms</a>
+                   <span class="mx-1">&middot;</span>
+                   <a class="small" href="#!">Contact</a>
+               </div>
+           </div>
+       </div>
+   </footer>
+
+   <!-- Bootstrap core JS -->
+   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+   
+   <!-- Custom script -->
+   <script>
+       document.getElementById("consentForm").addEventListener("submit", function(event) {
+           event.preventDefault();
+           const consent = document.querySelector('input[name="consent"]:checked');
+           
+           if (!consent) {
+               alert("동의 여부를 선택해주세요.");
+               return;
+           }
+
+           if (consent.value === "agree") {
+               // 기증에 동의할 경우 contact 페이지로 이동
+               window.location.href = "/contact";
+           } else {
+               // 미동의시 문진 페이지로 이동
+               alert("문진 페이지로 이동합니다.");
+               window.location.href = "https://eo-m.com/2025/HSP/HSP_Controller.asp?part=nfc&mehId=GV4541&mtype=1";
+           }
+       });
+
+       // 페이지 로드 완료 시 실행
+       document.addEventListener('DOMContentLoaded', function() {
+           console.log('Page loaded successfully');
+       });
+   </script>
+</body>
+</html>

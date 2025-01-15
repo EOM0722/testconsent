@@ -1,0 +1,8 @@
+[build]
+  publish = "/"
+  command = "echo 'No build required'"  # 또는 그냥 비워둬도 됨
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
