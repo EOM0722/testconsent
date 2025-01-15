@@ -22,7 +22,8 @@
             position: relative;
             width: 100%;
             height: 200px;
-            background-color: #f8f9fa;
+            background: white;
+            border: 1px solid #ccc;
             border-radius: 4px;
             overflow: hidden;
         }
@@ -30,6 +31,7 @@
             position: relative;
             width: 100%;
             height: 100%;
+            background: white;
             touch-action: none !important;
             -webkit-touch-callout: none;
             -webkit-user-select: none;
@@ -37,16 +39,15 @@
             -moz-user-select: none;
             -ms-user-select: none;
             user-select: none;
-            overflow: hidden;
         }
         #signatureCanvas {
             position: absolute;
-            left: 0;
             top: 0;
-            width: 100%;
-            height: 100%;
-            border: 1px solid #ccc;
+            left: 0;
+            width: 100% !important;
+            height: 100% !important;
             touch-action: none !important;
+            cursor: crosshair;
             background: white;
         }
         .clear-button {
@@ -54,7 +55,8 @@
             bottom: 10px;
             right: 10px;
             z-index: 100;
-            background-color: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.9);
+            padding: 4px 8px;
         }
         select {
             -webkit-appearance: auto;
@@ -68,6 +70,14 @@
             .clear-button {
                 padding: 4px 8px;
                 font-size: 12px;
+            }
+        }
+        @supports (-webkit-touch-callout: none) {
+            .signature-pad-container {
+                cursor: pointer;
+            }
+            #signatureCanvas {
+                cursor: pointer;
             }
         }
     </style>
@@ -89,7 +99,6 @@
                     <div class="row gx-5 justify-content-center">
                         <div class="col-lg-8 col-xl-6">
                             <form id="contactForm">
-                                <!-- 기존 폼 필드들 유지 -->
                                 <div class="form-floating mb-3">
                                     <input class="form-control" id="name" type="text" placeholder="성명을 입력하세요..." 
                                            aria-label="성명" required />
@@ -185,7 +194,6 @@
             </div>
         </section>
     </main>
-    <!-- 모바일 환경에서 스크롤과 줌 방지 -->
     <script>
         document.addEventListener('touchmove', function(e) {
             if (e.target.closest('.signature-pad-container')) {
@@ -199,7 +207,6 @@
             }
         });
 
-        // iOS 더블탭 줌 방지
         document.addEventListener('touchend', function(e) {
             if (e.target.closest('.signature-pad-container')) {
                 e.preventDefault();
