@@ -28,6 +28,11 @@
             bottom: 10px;
             right: 10px;
         }
+        select {
+            -webkit-appearance: auto;
+            -moz-appearance: auto;
+            appearance: auto;
+        }
     </style>
 </head>
 <body class="d-flex flex-column">
@@ -113,8 +118,7 @@
                                 <div class="mb-4">
                                     <label class="form-label fw-bold mb-2">서명</label>
                                     <div class="border rounded p-3 signature-pad" style="touch-action: none;">
-                                        <canvas id="signatureCanvas" aria-label="서명 패드" 
-                                                style="touch-action: none; -webkit-user-select: none; -moz-user-select: none; -ms-user-select: none; user-select: none;"></canvas>
+                                        <canvas id="signatureCanvas" aria-label="서명 패드"></canvas>
                                         <button type="button" class="btn btn-outline-secondary btn-sm clear-button" 
                                                 onclick="clearSignature()"
                                                 aria-label="서명 다시하기">다시 서명하기</button>
