@@ -11759,10 +11759,3 @@ html {
   background-color: #f1f8e9;
   margin-right: 70px;
 }
-
-{
-    width: 100%; /* 부모 컨테이너 너비에 맞추기 */
-    height: 200px; /* 고정 높이 */
-    border: 1px solid #ccc; /* 시각적 구분 */
-    touch-action: none; /* 터치 기본 동작 방지 */
-}
