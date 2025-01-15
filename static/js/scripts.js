@@ -32,11 +32,21 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function resizeCanvas() {
+        const savedData = canvas.toDataURL(); // 현재 서명 데이터 저장
         canvas.width = canvas.offsetWidth;
         canvas.height = 200;
         ctx.strokeStyle = 'blue';
         ctx.lineWidth = 2;
         ctx.lineCap = 'round';
+
+        // 저장된 서명 데이터 복원
+        if (savedData) {
+            const img = new Image();
+            img.onload = function() {
+                ctx.drawImage(img, 0, 0);
+            };
+            img.src = savedData;
+        }
     }
 
     function startDrawing(e) {
@@ -50,11 +60,11 @@ document.addEventListener("DOMContentLoaded", () => {
     function draw(e) {
         if (!isDrawing) return;
         e.preventDefault();
-        
+
         const rect = canvas.getBoundingClientRect();
         const x = (e.clientX || e.touches[0].clientX) - rect.left;
         const y = (e.clientY || e.touches[0].clientY) - rect.top;
-        
+
         ctx.beginPath();
         ctx.moveTo(lastX, lastY);
         ctx.lineTo(x, y);
@@ -69,35 +79,63 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function initializeEvents() {
         resizeCanvas();
-        
-        canvas.addEventListener("mousedown", (e) => {
+
+        // 터치 이벤트
+        canvas.addEventListener("touchstart", function(e) {
+            e.preventDefault(); // 기본 동작 방지
+            const touch = e.touches[0];
+            const rect = canvas.getBoundingClientRect();
+            startDrawing({
+                clientX: touch.clientX,
+                clientY: touch.clientY
+            });
+        }, { passive: false });
+
+        canvas.addEventListener("touchmove", function(e) {
+            e.preventDefault(); // 기본 동작 방지
+            if (!isDrawing) return;
+            const touch = e.touches[0];
+            draw({
+                clientX: touch.clientX,
+                clientY: touch.clientY
+            });
+        }, { passive: false });
+
+        canvas.addEventListener("touchend", function(e) {
+            e.preventDefault(); // 기본 동작 방지
+            stopDrawing();
+        }, { passive: false });
+
+        // 마우스 이벤트
+        canvas.addEventListener("mousedown", function(e) {
             e.preventDefault();
             startDrawing(e);
         });
-        
-        canvas.addEventListener("mousemove", (e) => {
+
+        canvas.addEventListener("mousemove", function(e) {
             e.preventDefault();
             if (!isDrawing) return;
             draw(e);
         });
-        
+
         canvas.addEventListener("mouseup", stopDrawing);
         canvas.addEventListener("mouseout", stopDrawing);
 
-        canvas.addEventListener("touchstart", (e) => {
-            e.preventDefault();
-            startDrawing(e);
+        // 리사이즈 이벤트
+        let resizeTimer;
+        window.addEventListener("resize", function() {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(function() {
+                resizeCanvas();
+            }, 250);
         });
-        
-        canvas.addEventListener("touchmove", (e) => {
-            e.preventDefault();
-            if (!isDrawing) return;
-            draw(e);
-        });
-        
-        canvas.addEventListener("touchend", stopDrawing);
 
-        window.addEventListener("resize", resizeCanvas);
+        // 포커스 변경 방지
+        document.addEventListener('focusin', function(e) {
+            if (e.target.tagName !== 'CANVAS') {
+                e.preventDefault();
+            }
+        }, false);
     }
 
     window.clearSignature = function() {
@@ -105,7 +143,6 @@ document.addEventListener("DOMContentLoaded", () => {
         hasSignature = false;
     };
 
-    // 서명 검증 함수
     function isCanvasEmpty() {
         const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
         for (let i = 0; i < pixels.length; i += 4) {
@@ -151,11 +188,11 @@ document.addEventListener("DOMContentLoaded", () => {
     window.submitForm = async function() {
         try {
             if (!validateForm()) return;
-    
+
             const submitButton = document.querySelector('button[aria-label="기증 동의서 제출"]');
             submitButton.disabled = true;
             submitButton.textContent = "제출 중...";
-    
+
             const formData = {
                 name: document.getElementById("name").value,
                 birthYear: document.getElementById("birthYear").value,
@@ -169,9 +206,9 @@ document.addEventListener("DOMContentLoaded", () => {
                 consentDay: document.getElementById("consentDay").value,
                 signature: canvas.toDataURL("image/png")
             };
-    
+
             // 서명 이미지 저장
-            const signatureResponse = await fetch(`${API_URL}/save-signature`, {
+            await fetch(`${API_URL}/save-signature`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ 
@@ -179,7 +216,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     signature: formData.signature 
                 })
             });
-    
+
             // 구글 시트 저장
             await fetch(GOOGLE_SCRIPT_URL, {
                 method: "POST",
@@ -194,11 +231,11 @@ document.addEventListener("DOMContentLoaded", () => {
                     consent: "TRUE"
                 })
             }).catch(err => console.log('구글 시트 저장 중 오류 (무시해도 됨)'));
-    
+
             alert("기증 동의서가 성공적으로 제출되었습니다. 문진 버튼을 클릭하여 다음 단계를 진행해주세요.");
             submitButton.textContent = "제출 완료";
             submitButton.disabled = true;
-    
+
         } catch (error) {
             alert("저장 중 오류가 발생했습니다. 다시 시도해주세요.");
             const submitButton = document.querySelector('button[aria-label="기증 동의서 제출"]');
@@ -207,7 +244,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     };
 
-    // 페이지 초기화
     initializeDateSelectors();
     initializeEvents();
 });
