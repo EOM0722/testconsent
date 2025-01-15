@@ -83,10 +83,6 @@ document.addEventListener("DOMContentLoaded", () => {
             clientY = e.clientY - rect.top;
         }
 
-        // 좌표 범위 제한
-        clientX = Math.max(0, Math.min(clientX, rect.width));
-        clientY = Math.max(0, Math.min(clientY, rect.height));
-
         return {
             x: clientX * scaleX,
             y: clientY * scaleY
@@ -99,7 +95,6 @@ document.addEventListener("DOMContentLoaded", () => {
         const coords = getCoordinates(e);
         [lastX, lastY] = [coords.x, coords.y];
 
-        // 시작점 표시
         ctx.beginPath();
         ctx.moveTo(lastX, lastY);
         ctx.lineTo(lastX, lastY);
@@ -122,7 +117,7 @@ document.addEventListener("DOMContentLoaded", () => {
     function stopDrawing(e) {
         if (e) e.preventDefault();
         isDrawing = false;
-        ctx.beginPath(); // 현재 경로 초기화
+        ctx.beginPath();
     }
 
     function initializeEvents() {
@@ -181,7 +176,6 @@ document.addEventListener("DOMContentLoaded", () => {
     function isCanvasEmpty() {
         const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
         return !pixels.some((pixel, index) => {
-            // 흰색이 아닌 픽셀 확인 (RGB가 모두 255가 아닌 경우)
             return index % 4 !== 3 && pixel !== 255;
         });
     }
@@ -240,7 +234,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 signature: canvas.toDataURL()
             };
 
-            // 서명 이미지 저장
             const signatureResponse = await fetch(`${API_URL}/save-signature`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
@@ -254,7 +247,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 throw new Error('서명 저장 실패');
             }
 
-            // 구글 시트 저장
             await fetch(GOOGLE_SCRIPT_URL, {
                 method: "POST",
                 headers: { "Content-Type": "application/x-www-form-urlencoded" },
