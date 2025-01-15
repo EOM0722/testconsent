@@ -35,9 +35,15 @@ document.addEventListener("DOMContentLoaded", () => {
         const dpr = window.devicePixelRatio || 1;
         const oldData = canvas.toDataURL();
         
+        // CSS 크기 설정
+        canvas.style.width = `${rect.width}px`;
+        canvas.style.height = '200px';
+        
+        // 실제 캔버스 크기 설정
         canvas.width = rect.width * dpr;
         canvas.height = 200 * dpr;
         
+        // 컨텍스트 스케일 조정
         ctx.scale(dpr, dpr);
         ctx.strokeStyle = 'blue';
         ctx.lineWidth = 2;
@@ -52,18 +58,17 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function getCoordinates(e) {
         const rect = canvas.getBoundingClientRect();
-        const scaleX = canvas.width / rect.width;
-        const scaleY = canvas.height / rect.height;
-
+        const dpr = window.devicePixelRatio || 1;
+        
         if (e.touches && e.touches[0]) {
             return {
-                x: (e.touches[0].clientX - rect.left) * scaleX,
-                y: (e.touches[0].clientY - rect.top) * scaleY
+                x: (e.touches[0].clientX - rect.left) * dpr,
+                y: (e.touches[0].clientY - rect.top) * dpr
             };
         }
         return {
-            x: (e.clientX - rect.left) * scaleX,
-            y: (e.clientY - rect.top) * scaleY
+            x: (e.clientX - rect.left) * dpr,
+            y: (e.clientY - rect.top) * dpr
         };
     }
 
@@ -114,14 +119,20 @@ document.addEventListener("DOMContentLoaded", () => {
             resizeTimer = setTimeout(resizeCanvas, 250);
         });
 
-        // 스크롤 방지
+        // 기본 스크롤 동작 방지
         canvas.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+        }, { passive: false });
+
+        // 모바일에서 줌 방지
+        canvas.addEventListener('gesturestart', (e) => {
             e.preventDefault();
         }, { passive: false });
     }
 
     window.clearSignature = function() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        const dpr = window.devicePixelRatio || 1;
+        ctx.clearRect(0, 0, canvas.width * dpr, canvas.height * dpr);
         hasSignature = false;
     };
 
