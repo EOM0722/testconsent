@@ -1,5 +1,5 @@
 const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzrbRcC7B-TcuQAZ1fKIOxlsE9V3HfYZ4ky6LnWbw8dZzdsO1j_y7s4MwMFSeMkRW-g/exec';
-const API_URL = 'http://localhost:8080';
+const API_URL = 'https://consent.ngrok.app';
 
 document.addEventListener("DOMContentLoaded", () => {
     const canvas = document.getElementById("signatureCanvas");
@@ -7,7 +7,6 @@ document.addEventListener("DOMContentLoaded", () => {
     let isDrawing = false, lastX = 0, lastY = 0;
     let hasSignature = false;
 
-    // Initialize date selectors
     function initializeDateSelectors() {
         const currentYear = new Date().getFullYear();
         for (let i = currentYear; i >= 1900; i--) {
@@ -32,48 +31,64 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function resizeCanvas() {
-        const savedData = canvas.toDataURL(); // 현재 서명 데이터 저장
-        canvas.width = canvas.offsetWidth;
-        canvas.height = 200;
+        const rect = canvas.getBoundingClientRect();
+        const dpr = window.devicePixelRatio || 1;
+        const oldData = canvas.toDataURL();
+        
+        canvas.width = rect.width * dpr;
+        canvas.height = 200 * dpr;
+        
+        ctx.scale(dpr, dpr);
         ctx.strokeStyle = 'blue';
         ctx.lineWidth = 2;
         ctx.lineCap = 'round';
 
-        // 저장된 서명 데이터 복원
-        if (savedData) {
+        if (oldData && oldData !== canvas.toDataURL()) {
             const img = new Image();
-            img.onload = function() {
-                ctx.drawImage(img, 0, 0);
-            };
-            img.src = savedData;
+            img.onload = () => ctx.drawImage(img, 0, 0);
+            img.src = oldData;
         }
     }
 
-    function startDrawing(e) {
-        isDrawing = true;
+    function getCoordinates(e) {
         const rect = canvas.getBoundingClientRect();
-        const x = (e.clientX || e.touches[0].clientX) - rect.left;
-        const y = (e.clientY || e.touches[0].clientY) - rect.top;
-        [lastX, lastY] = [x, y];
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+
+        if (e.touches && e.touches[0]) {
+            return {
+                x: (e.touches[0].clientX - rect.left) * scaleX,
+                y: (e.touches[0].clientY - rect.top) * scaleY
+            };
+        }
+        return {
+            x: (e.clientX - rect.left) * scaleX,
+            y: (e.clientY - rect.top) * scaleY
+        };
+    }
+
+    function startDrawing(e) {
+        e.preventDefault();
+        isDrawing = true;
+        const coords = getCoordinates(e);
+        [lastX, lastY] = [coords.x, coords.y];
     }
 
     function draw(e) {
         if (!isDrawing) return;
         e.preventDefault();
 
-        const rect = canvas.getBoundingClientRect();
-        const x = (e.clientX || e.touches[0].clientX) - rect.left;
-        const y = (e.clientY || e.touches[0].clientY) - rect.top;
-
+        const coords = getCoordinates(e);
         ctx.beginPath();
         ctx.moveTo(lastX, lastY);
-        ctx.lineTo(x, y);
+        ctx.lineTo(coords.x, coords.y);
         ctx.stroke();
-        [lastX, lastY] = [x, y];
+        [lastX, lastY] = [coords.x, coords.y];
         hasSignature = true;
     }
 
-    function stopDrawing() {
+    function stopDrawing(e) {
+        if (e) e.preventDefault();
         isDrawing = false;
     }
 
@@ -81,61 +96,28 @@ document.addEventListener("DOMContentLoaded", () => {
         resizeCanvas();
 
         // 터치 이벤트
-        canvas.addEventListener("touchstart", function(e) {
-            e.preventDefault(); // 기본 동작 방지
-            const touch = e.touches[0];
-            const rect = canvas.getBoundingClientRect();
-            startDrawing({
-                clientX: touch.clientX,
-                clientY: touch.clientY
-            });
-        }, { passive: false });
-
-        canvas.addEventListener("touchmove", function(e) {
-            e.preventDefault(); // 기본 동작 방지
-            if (!isDrawing) return;
-            const touch = e.touches[0];
-            draw({
-                clientX: touch.clientX,
-                clientY: touch.clientY
-            });
-        }, { passive: false });
-
-        canvas.addEventListener("touchend", function(e) {
-            e.preventDefault(); // 기본 동작 방지
-            stopDrawing();
-        }, { passive: false });
+        canvas.addEventListener("touchstart", startDrawing, { passive: false });
+        canvas.addEventListener("touchmove", draw, { passive: false });
+        canvas.addEventListener("touchend", stopDrawing, { passive: false });
+        canvas.addEventListener("touchcancel", stopDrawing, { passive: false });
 
         // 마우스 이벤트
-        canvas.addEventListener("mousedown", function(e) {
-            e.preventDefault();
-            startDrawing(e);
-        });
-
-        canvas.addEventListener("mousemove", function(e) {
-            e.preventDefault();
-            if (!isDrawing) return;
-            draw(e);
-        });
-
+        canvas.addEventListener("mousedown", startDrawing);
+        canvas.addEventListener("mousemove", draw);
         canvas.addEventListener("mouseup", stopDrawing);
         canvas.addEventListener("mouseout", stopDrawing);
 
         // 리사이즈 이벤트
         let resizeTimer;
-        window.addEventListener("resize", function() {
+        window.addEventListener("resize", () => {
             clearTimeout(resizeTimer);
-            resizeTimer = setTimeout(function() {
-                resizeCanvas();
-            }, 250);
+            resizeTimer = setTimeout(resizeCanvas, 250);
         });
 
-        // 포커스 변경 방지
-        document.addEventListener('focusin', function(e) {
-            if (e.target.tagName !== 'CANVAS') {
-                e.preventDefault();
-            }
-        }, false);
+        // 스크롤 방지
+        canvas.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+        }, { passive: false });
     }
 
     window.clearSignature = function() {
@@ -145,12 +127,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     function isCanvasEmpty() {
         const pixels = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
-        for (let i = 0; i < pixels.length; i += 4) {
-            if (pixels[i + 3] !== 0) {
-                return false;
-            }
-        }
-        return true;
+        return !pixels.some(pixel => pixel !== 0);
     }
 
     function validateForm() {
@@ -204,11 +181,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 consentYear: document.getElementById("consentYear").value,
                 consentMonth: document.getElementById("consentMonth").value,
                 consentDay: document.getElementById("consentDay").value,
-                signature: canvas.toDataURL("image/png")
+                signature: canvas.toDataURL()
             };
 
             // 서명 이미지 저장
-            await fetch(`${API_URL}/save-signature`, {
+            const signatureResponse = await fetch(`${API_URL}/save-signature`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ 
@@ -216,6 +193,10 @@ document.addEventListener("DOMContentLoaded", () => {
                     signature: formData.signature 
                 })
             });
+
+            if (!signatureResponse.ok) {
+                throw new Error('서명 저장 실패');
+            }
 
             // 구글 시트 저장
             await fetch(GOOGLE_SCRIPT_URL, {
@@ -237,6 +218,7 @@ document.addEventListener("DOMContentLoaded", () => {
             submitButton.disabled = true;
 
         } catch (error) {
+            console.error('제출 중 오류:', error);
             alert("저장 중 오류가 발생했습니다. 다시 시도해주세요.");
             const submitButton = document.querySelector('button[aria-label="기증 동의서 제출"]');
             submitButton.disabled = false;
